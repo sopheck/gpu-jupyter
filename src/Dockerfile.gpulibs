@@ -27,6 +27,8 @@ RUN set -ex \
     torchvision==0.14.1 \
     torchaudio==0.13.1 \
     torchviz==0.0.2 \
+    torchsummary==1.5.1 \
+    torchinfo==1.7.2 \
 ' \
  && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu116 \
  && fix-permissions "${CONDA_DIR}" \
@@ -34,7 +36,7 @@ RUN set -ex \
 
 # Install dependencies for computer vision tasks
 RUN pip install --no-cache-dir \
-    opencv-python>=4.1.1 \
+    opencv-python>=4.6.0 \
     ultralytics==8.0.99 \
     'git+https://github.com/facebookresearch/detectron2.git' \
     facenet-pytorch==2.5.3 \
