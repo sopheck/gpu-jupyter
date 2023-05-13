@@ -1,4 +1,4 @@
-LABEL maintainer="Christoph Schranz <christoph.schranz@salzburgresearch.at>, Mathematical Michael <consistentbayes@gmail.com>"
+LABEL maintainer="Christoph Schranz <christoph.schranz@salzburgresearch.at>, Mathematical Michael <consistentbayes@gmail.com>, sopheck <sophie.eckenstaler.1@hu-berlin.de>"
 
 # Install Tensorflow, check compatibility here:
 # https://www.tensorflow.org/install/source#gpu
@@ -31,6 +31,15 @@ RUN set -ex \
  && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu116 \
  && fix-permissions "${CONDA_DIR}" \
  && fix-permissions "/home/${NB_USER}"
+
+# Install dependencies for computer vision tasks
+RUN pip install --no-cache-dir \
+    opencv-python>=4.1.1 \
+    'git+https://github.com/facebookresearch/detectron2.git' \
+    facenet-pytorch==2.5.3 \
+    deepface==0.0.79 && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}" 
 
 USER root
 ENV CUDA_PATH=/opt/conda/
