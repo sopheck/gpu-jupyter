@@ -7,7 +7,7 @@
 
 # Use NVIDIA CUDA as base image and run the same installation as in the other packages.
 # The version of cuda must match those of the packages installed in src/Dockerfile.gpulibs
-FROM nvidia/cuda:11.6.2-cudnn8-runtime-ubuntu20.04
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
 LABEL authors="Christoph Schranz <christoph.schranz@salzburgresearch.at>, Mathematical Michael <consistentbayes@gmail.com>"
 # This is a concatenated Dockerfile, the maintainers of subsequent sections may vary.
 RUN chmod 1777 /tmp && chmod 1777 /var/tmp
@@ -319,14 +319,14 @@ WORKDIR "${HOME}"
 ########################## Dependency: gpulibs #############################
 ############################################################################
 
-LABEL maintainer="Christoph Schranz <christoph.schranz@salzburgresearch.at>, Mathematical Michael <consistentbayes@gmail.com>"
+LABEL maintainer="Christoph Schranz <christoph.schranz@salzburgresearch.at>, Mathematical Michael <consistentbayes@gmail.com>, sopheck <sophie.eckenstaler.1@hu-berlin.de>"
 
 # Install Tensorflow, check compatibility here:
 # https://www.tensorflow.org/install/source#gpu
 # installation via conda leads to errors in version 4.8.2
 USER ${NB_UID}
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir tensorflow==2.10.1 keras==2.10 && \
+    pip install --no-cache-dir tensorflow==2.12.0 keras==2.12 && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
@@ -344,14 +344,24 @@ RUN conda install --quiet --yes \
 #     torchviz==0.0.2 --extra-index-url https://download.pytorch.org/whl/cu116
 RUN set -ex \
  && buildDeps=' \
-    torch==1.13.1 \
-    torchvision==0.14.1 \
-    torchaudio==0.13.1 \
+    torch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 --index-url https://download.pytorch.org/whl/cu118 \
     torchviz==0.0.2 \
+    torchsummary==1.5.1 \
+    torchinfo==1.7.2
 ' \
  && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu116 \
  && fix-permissions "${CONDA_DIR}" \
  && fix-permissions "/home/${NB_USER}"
+
+# Install dependencies for computer vision tasks
+RUN pip install --no-cache-dir \
+    opencv-python>=4.6.0 \
+    ultralytics==8.0.99 \
+    'git+https://github.com/facebookresearch/detectron2.git' \
+    facenet-pytorch==2.5.3 \
+    deepface==0.0.79 && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}" 
 
 USER root
 ENV CUDA_PATH=/opt/conda/
@@ -363,7 +373,20 @@ RUN apt-get update && \
 
 # reinstall nvcc with cuda-nvcc to install ptax
 USER $NB_UID
-RUN conda install -c nvidia cuda-nvcc -y && \
+# Check error in Ubuntu-22.04 here: https://www.tensorflow.org/install/pip#step-by-step_instructions
+#RUN conda install -c nvidia cuda-nvcc -y && \
+#    conda clean --all -f -y && \
+#    fix-permissions $CONDA_DIR && \
+#    fix-permissions /home/$NB_USER
+RUN # Install NVCC
+    conda install -c nvidia cuda-nvcc=11.3.58 -y && \
+    # Configure the XLA cuda directory
+    mkdir -p $CONDA_DIR/etc/conda/activate.d && \
+    printf 'export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_DIR/lib/\n' >> $CONDA_DIR/etc/conda/activate.d/env_vars.sh && \
+    source $CONDA_DIR/etc/conda/activate.d/env_vars.sh && \
+    # Copy libdevice file to the required path
+    mkdir -p $CONDA_DIR/lib/nvvm/libdevice && \
+    cp $CONDA_DIR/lib/libdevice.10.bc $CONDA_DIR/lib/nvvm/libdevice/ && \
     conda clean --all -f -y && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
@@ -372,18 +395,17 @@ USER root
 RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas
 
 USER $NB_UID
-
   ############################################################################
   ############################ Useful packages ###############################
   ############################################################################
   
-LABEL authors="Christoph Schranz <christoph.schranz@salzburgresearch.at>, Mathematical Michael <consistentbayes@gmail.com>"
+LABEL authors="Christoph Schranz <christoph.schranz@salzburgresearch.at>, Mathematical Michael <consistentbayes@gmail.com>, sopheck <sophie.eckenstaler.1@hu-berlin.de>"
 
 USER root
 
 # Install useful packages and Graphviz
 RUN apt-get update \
- && apt-get -y install --no-install-recommends htop apt-utils iputils-ping graphviz libgraphviz-dev openssh-client \
+ && apt-get -y install --no-install-recommends htop apt-utils iputils-ping graphviz libgraphviz-dev openssh-client curl \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID
@@ -418,7 +440,13 @@ RUN pip install --no-cache-dir \
     ipyleaflet==0.17.2 \
     ipywidgets==8.0.4 \
     # install spell checker
-    jupyterlab-spellchecker==0.7.3 && \
+    jupyterlab-spellchecker==0.7.3 \
+    # > BEGIN custom libraries
+    # install link share
+    jupyterlab-link-share==0.3.0 \
+    # install NVDashboard (https://developer.nvidia.com/blog/gpu-dashboards-in-jupyter-lab/)
+    jupyterlab_nvdashboard==0.8.0 && \
+    # < END custom libraries
     # fix permissions of conda
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
