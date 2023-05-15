@@ -344,7 +344,9 @@ RUN conda install --quiet --yes \
 #     torchviz==0.0.2 --extra-index-url https://download.pytorch.org/whl/cu116
 RUN set -ex \
  && buildDeps=' \
-    torch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 --index-url https://download.pytorch.org/whl/cu118 \
+    torch==2.0.0 \
+    torchvision==0.15.0 \
+    torchaudio==2.0.0 \
     torchviz==0.0.2 \
     torchsummary==1.5.1 \
     torchinfo==1.7.2 \
