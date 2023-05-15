@@ -26,7 +26,7 @@ RUN set -ex \
     torch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 --index-url https://download.pytorch.org/whl/cu118 \
     torchviz==0.0.2 \
     torchsummary==1.5.1 \
-    torchinfo==1.7.2
+    torchinfo==1.7.2 \
 ' \
  && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu116 \
  && fix-permissions "${CONDA_DIR}" \
@@ -57,8 +57,7 @@ USER $NB_UID
 #    conda clean --all -f -y && \
 #    fix-permissions $CONDA_DIR && \
 #    fix-permissions /home/$NB_USER
-RUN # Install NVCC
-    conda install -c nvidia cuda-nvcc=11.3.58 -y && \
+RUN conda install -c nvidia cuda-nvcc=11.3.58 -y && \
     # Configure the XLA cuda directory
     mkdir -p $CONDA_DIR/etc/conda/activate.d && \
     printf 'export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_DIR/lib/\n' >> $CONDA_DIR/etc/conda/activate.d/env_vars.sh && \
