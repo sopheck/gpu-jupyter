@@ -1,14 +1,6 @@
 LABEL maintainer="Christoph Schranz <christoph.schranz@salzburgresearch.at>, Mathematical Michael <consistentbayes@gmail.com>, sopheck <sophie.eckenstaler.1@hu-berlin.de>"
 
-# Install Tensorflow, check compatibility here:
-# https://www.tensorflow.org/install/source#gpu
-# installation via conda leads to errors in version 4.8.2
 USER ${NB_UID}
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir tensorflow==2.12.0 keras==2.12 && \
-    fix-permissions "${CONDA_DIR}" && \
-    fix-permissions "/home/${NB_USER}"
-
 # Install PyTorch with dependencies
 RUN conda install --quiet --yes \
     pyyaml mkl mkl-include setuptools cmake cffi typing && \
@@ -39,7 +31,6 @@ RUN pip install --no-cache-dir \
     ultralytics==8.0.99 \
     'git+https://github.com/facebookresearch/detectron2.git' \
     facenet-pytorch==2.5.3 \
-    deepface==0.0.79 && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}" 
 
@@ -58,17 +49,6 @@ RUN conda install -c nvidia cuda-nvcc -y && \
     conda clean --all -f -y && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
-#RUN conda install -c nvidia cuda-nvcc=11.3.58 -y && \
-#    # Configure the XLA cuda directory
-#    mkdir -p $CONDA_DIR/etc/conda/activate.d && \
-#    printf 'export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_DIR/lib/\n' >> $CONDA_DIR/etc/conda/activate.d/env_vars.sh && \
-#    source $CONDA_DIR/etc/conda/activate.d/env_vars.sh && \
-#    # Copy libdevice file to the required path
-#    mkdir -p $CONDA_DIR/lib/nvvm/libdevice && \
-#    cp $CONDA_DIR/lib/libdevice.10.bc $CONDA_DIR/lib/nvvm/libdevice/ && \
-#    conda clean --all -f -y && \
-#    fix-permissions $CONDA_DIR && \
-#    fix-permissions /home/$NB_USER
 
 USER root
 RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas

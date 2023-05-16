@@ -44,7 +44,7 @@ RUN pip install --no-cache-dir \
     # install link share
     jupyterlab-link-share==0.3.0 \
     # install NVDashboard (https://developer.nvidia.com/blog/gpu-dashboards-in-jupyter-lab/)
-    jupyterlab_nvdashboard==0.8.0 && \
+    # jupyterlab_nvdashboard==0.8.0 && \ does not work in current version
     # < END custom libraries
     # fix permissions of conda
     fix-permissions "${CONDA_DIR}" && \
