@@ -322,37 +322,26 @@ WORKDIR "${HOME}"
 LABEL maintainer="Christoph Schranz <christoph.schranz@salzburgresearch.at>, Mathematical Michael <consistentbayes@gmail.com>, sopheck <sophie.eckenstaler.1@hu-berlin.de>"
 
 USER ${NB_UID}
-# Install PyTorch with dependencies
-RUN conda install --quiet --yes \
-    pyyaml mkl mkl-include setuptools cmake cffi typing && \
-    conda clean --all -f -y && \
+# Install Tensorflow, check compatibility here:
+# https://www.tensorflow.org/install/source#gpu
+# installation via conda leads to errors in version 4.8.2
+USER ${NB_UID}
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir tensorflow==2.12.0 keras==2.12 && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
-
-# Check compatibility here:
-# https://pytorch.org/get-started/locally/
-# Installation via conda leads to errors installing cudatoolkit=11.1
-# RUN pip install --no-cache-dir torch==1.13.1 torchvision==0.14.1 torchaudio==0.13.1  && \
-#     torchviz==0.0.2 --extra-index-url https://download.pytorch.org/whl/cu116
-RUN set -ex \
- && buildDeps=' \
-    torch==1.13.1 \
-    torchvision==0.14.1 \
-    torchaudio==0.13.1 \
-    torchviz==0.0.2 \
-' \
- && pip install --upgrade pip \
- && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu116 \
- && pip install --no-cache-dir torchsummary==1.5.1 torchinfo==1.7.2 \
- && fix-permissions "${CONDA_DIR}" \
- && fix-permissions "/home/${NB_USER}"
 
 # Install dependencies for computer vision tasks
 RUN pip install --no-cache-dir \
     opencv-python>=4.6.0 \
-    ultralytics==8.0.99 \
-    'git+https://github.com/facebookresearch/detectron2.git' \
-    facenet-pytorch==2.5.3 && \
+    deepface== \
+    onnx==1.9.0 \
+    gdown>=3.10.1 \
+    Flask>=1.1.2 \
+    mtcnn>=0.1.0 \
+    retina-face>=0.0.1 \
+    fire>=0.4.0 \
+    gunicorn>=20.1.0 && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}" 
 
