@@ -31,7 +31,7 @@ RUN pip install --no-cache-dir \
     opencv-python>=4.6.0 \
     ultralytics==8.0.99 \
     'git+https://github.com/facebookresearch/detectron2.git' \
-    facenet-pytorch==2.5.3 \
+    facenet-pytorch==2.5.3 && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}" 
 
