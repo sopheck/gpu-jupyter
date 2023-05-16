@@ -336,12 +336,12 @@ RUN conda install --quiet --yes \
 #     torchviz==0.0.2 --extra-index-url https://download.pytorch.org/whl/cu116
 RUN set -ex \
  && buildDeps=' \
-    torch==2.0.0 \
-    torchvision==0.15.0 \
-    torchaudio==2.0.0 \
+    torch==1.13.1 \
+    torchvision==0.14.1 \
+    torchaudio==0.13.1 \
     torchviz==0.0.2 \
 ' \
- && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu118 \
+ && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu116 \
  && pip install --no-cache-dir torchsummary==1.5.1 torchinfo==1.7.2 \
  && fix-permissions "${CONDA_DIR}" \
  && fix-permissions "/home/${NB_USER}"
@@ -372,7 +372,8 @@ RUN conda install -c nvidia cuda-nvcc -y && \
     fix-permissions /home/$NB_USER
 
 USER root
-RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas
+RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
+    ln -s /opt/conda/nvvm /usr/local/cuda/nvvm
 
 USER $NB_UID
   ############################################################################
