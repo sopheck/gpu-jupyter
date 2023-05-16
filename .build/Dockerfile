@@ -393,7 +393,6 @@ RUN conda install -c nvidia cuda-nvcc -y && \
 
 USER root
 RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
-    mkdir -p /usr/local/cuda/nvvm && \
     ln -s /opt/conda/nvvm /usr/local/cuda/nvvm
 
 USER $NB_UID
