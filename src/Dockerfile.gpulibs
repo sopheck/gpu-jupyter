@@ -54,21 +54,21 @@ RUN apt-get update && \
 # reinstall nvcc with cuda-nvcc to install ptax
 USER $NB_UID
 # Check error in Ubuntu-22.04 here: https://www.tensorflow.org/install/pip#step-by-step_instructions
-#RUN conda install -c nvidia cuda-nvcc -y && \
-#    conda clean --all -f -y && \
-#    fix-permissions $CONDA_DIR && \
-#    fix-permissions /home/$NB_USER
-RUN conda install -c nvidia cuda-nvcc=11.3.58 -y && \
-    # Configure the XLA cuda directory
-    mkdir -p $CONDA_DIR/etc/conda/activate.d && \
-    printf 'export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_DIR/lib/\n' >> $CONDA_DIR/etc/conda/activate.d/env_vars.sh && \
-    source $CONDA_DIR/etc/conda/activate.d/env_vars.sh && \
-    # Copy libdevice file to the required path
-    mkdir -p $CONDA_DIR/lib/nvvm/libdevice && \
-    cp $CONDA_DIR/lib/libdevice.10.bc $CONDA_DIR/lib/nvvm/libdevice/ && \
+RUN conda install -c nvidia cuda-nvcc -y && \
     conda clean --all -f -y && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
+#RUN conda install -c nvidia cuda-nvcc=11.3.58 -y && \
+#    # Configure the XLA cuda directory
+#    mkdir -p $CONDA_DIR/etc/conda/activate.d && \
+#    printf 'export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_DIR/lib/\n' >> $CONDA_DIR/etc/conda/activate.d/env_vars.sh && \
+#    source $CONDA_DIR/etc/conda/activate.d/env_vars.sh && \
+#    # Copy libdevice file to the required path
+#    mkdir -p $CONDA_DIR/lib/nvvm/libdevice && \
+#    cp $CONDA_DIR/lib/libdevice.10.bc $CONDA_DIR/lib/nvvm/libdevice/ && \
+#    conda clean --all -f -y && \
+#    fix-permissions $CONDA_DIR && \
+#    fix-permissions /home/$NB_USER
 
 USER root
 RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas
