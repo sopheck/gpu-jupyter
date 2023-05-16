@@ -11,18 +11,21 @@ RUN pip install --upgrade pip && \
     fix-permissions "/home/${NB_USER}"
 
 # Install dependencies for computer vision tasks
-RUN pip install --no-cache-dir \
-    opencv-python>=4.6.0 \
+RUN set -ex \
+ && buildDeps=' \
+    opencv-python==4.6.0 \
     deepface==0.0.79 \
     onnx==1.9.0 \
-    gdown>=3.10.1 \
-    Flask>=1.1.2 \
-    mtcnn>=0.1.0 \
-    retina-face>=0.0.1 \
-    fire>=0.4.0 \
-    gunicorn>=20.1.0 && \
-    fix-permissions "${CONDA_DIR}" && \
-    fix-permissions "/home/${NB_USER}" 
+    gdown==3.10.1 \
+    Flask==1.1.2 \
+    mtcnn==0.1.0 \
+    retina-face==0.0.1 \
+    fire==0.4.0 \
+    gunicorn==20.1.0 \
+' \
+ && pip install --no-cache-dir $buildDeps \
+ && fix-permissions "${CONDA_DIR}" \
+ && fix-permissions "/home/${NB_USER}"
 
 USER root
 ENV CUDA_PATH=/opt/conda/
