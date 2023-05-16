@@ -338,12 +338,12 @@ RUN set -ex \
  && buildDeps=' \
     torch==1.13.1 \
     torchvision==0.14.1 \
-    torchaudio==0.13.1 \
     torchviz==0.0.2 \
+    torchsummary==1.5.1 \
+    torchinfo==1.7.2 \
 ' \
  && pip install --upgrade pip \
- && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu116 \
- && pip install --no-cache-dir torchsummary==1.5.1 torchinfo==1.7.2 \
+ && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu118 \
  && fix-permissions "${CONDA_DIR}" \
  && fix-permissions "/home/${NB_USER}"
 
