@@ -336,7 +336,7 @@ RUN set -ex \
  && buildDeps=' \
     opencv-python==4.6.0.66 \
     deepface==0.0.79 \
-    onnx==1.9.0 \
+    #onnx==1.9.0 \
     gdown==3.10.1 \
     Flask==1.1.2 \
     mtcnn==0.1.0 \
@@ -378,7 +378,7 @@ USER root
 
 # Install useful packages and Graphviz
 RUN apt-get update \
- && apt-get -y install --no-install-recommends htop apt-utils iputils-ping graphviz libgraphviz-dev openssh-client curl \
+ && apt-get -y install --no-install-recommends htop apt-utils iputils-ping graphviz libgraphviz-dev openssh-client curl cmake \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID

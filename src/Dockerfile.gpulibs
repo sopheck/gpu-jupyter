@@ -15,7 +15,7 @@ RUN set -ex \
  && buildDeps=' \
     opencv-python==4.6.0.66 \
     deepface==0.0.79 \
-    onnx==1.9.0 \
+    #onnx==1.9.0 \
     gdown==3.10.1 \
     Flask==1.1.2 \
     mtcnn==0.1.0 \
