@@ -336,14 +336,12 @@ RUN conda install --quiet --yes \
 #     torchviz==0.0.2 --extra-index-url https://download.pytorch.org/whl/cu116
 RUN set -ex \
  && buildDeps=' \
-    torch==1.13.1 \
-    torchvision==0.14.1 \
-    torchviz==0.0.2 \
-    torchsummary==1.5.1 \
-    torchinfo==1.7.2 \
+    torch==2.0.0+cu118 \
+    torchvision==0.15.1+cu118 \ 
 ' \
  && pip install --upgrade pip \
- && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu118 \
+ && pip install --no-cache-dir $buildDeps --index-url https://download.pytorch.org/whl/cu118 \
+ && pip install torchviz==0.0.2 torchsummary==1.5.1 torchinfo==1.7.2 \
  && fix-permissions "${CONDA_DIR}" \
  && fix-permissions "/home/${NB_USER}"
 
@@ -352,7 +350,8 @@ RUN pip install --no-cache-dir \
     opencv-python>=4.6.0 \
     ultralytics==8.0.99 \
     'git+https://github.com/facebookresearch/detectron2.git' \
-    facenet-pytorch==2.5.3 && \
+    facenet-pytorch==2.5.3 \
+    onnx>=1.12.0 && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}" 
 
