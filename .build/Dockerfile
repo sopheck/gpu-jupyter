@@ -334,7 +334,7 @@ RUN pip install --upgrade pip && \
 # Install dependencies for computer vision tasks
 RUN set -ex \
  && buildDeps=' \
-    opencv-python==4.6.0 \
+    opencv-python==4.6.0.66 \
     deepface==0.0.79 \
     onnx==1.9.0 \
     gdown==3.10.1 \
