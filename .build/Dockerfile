@@ -336,11 +336,11 @@ RUN conda install --quiet --yes \
 #     torchviz==0.0.2 --extra-index-url https://download.pytorch.org/whl/cu116
 RUN set -ex \
  && buildDeps=' \
-    torch==1.13.1 \
-    torchvision==0.14.1 \ 
+    torch==2.0.0+cu118 \
+    torchvision==0.15.1+cu118 \ 
 ' \
  && pip install --upgrade pip \
- && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu116 \
+ && pip install --no-cache-dir $buildDeps --index-url https://download.pytorch.org/whl/cu118 \
  && pip install torchviz==0.0.2 torchsummary==1.5.1 torchinfo==1.7.2 \
  && fix-permissions "${CONDA_DIR}" \
  && fix-permissions "/home/${NB_USER}"
@@ -370,7 +370,9 @@ RUN conda install -c nvidia cuda-nvcc -y && \
     fix-permissions /home/$NB_USER
 
 USER root
-RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas
+RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
+    # Check error in PyTorch2 https://discuss.pytorch.org/t/could-not-load-library-libcudnn-cnn-infer-so-8/175139/5
+    ln -s /opt/conda/lib/python3.10/site-packages/torch/lib/libnvrtc-672ee683.so.11.2 libnvrtc.so
 
 USER $NB_UID
   ############################################################################
