@@ -336,11 +336,11 @@ RUN conda install --quiet --yes \
 #     torchviz==0.0.2 --extra-index-url https://download.pytorch.org/whl/cu116
 RUN set -ex \
  && buildDeps=' \
-    torch==2.0.0+cu118 \
-    torchvision==0.15.1+cu118 \ 
+    torch==1.13.1 \
+    torchvision==0.14.1 \ 
 ' \
  && pip install --upgrade pip \
- && pip install --no-cache-dir $buildDeps --index-url https://download.pytorch.org/whl/cu118 \
+ && pip install --no-cache-dir $buildDeps --extra-index-url https://download.pytorch.org/whl/cu116 \
  && pip install torchviz==0.0.2 torchsummary==1.5.1 torchinfo==1.7.2 \
  && fix-permissions "${CONDA_DIR}" \
  && fix-permissions "/home/${NB_USER}"
@@ -350,7 +350,6 @@ RUN pip install --no-cache-dir \
     opencv-python>=4.6.0 \
     ultralytics==8.0.99 \
     'git+https://github.com/facebookresearch/detectron2.git' \
-    facenet-pytorch==2.5.3 \
     onnx>=1.12.0 && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}" 
@@ -365,7 +364,6 @@ RUN apt-get update && \
 
 # reinstall nvcc with cuda-nvcc to install ptax
 USER $NB_UID
-# Check error in Ubuntu-22.04 here: https://www.tensorflow.org/install/pip#step-by-step_instructions
 RUN conda install -c nvidia cuda-nvcc -y && \
     conda clean --all -f -y && \
     fix-permissions $CONDA_DIR && \
@@ -425,7 +423,8 @@ RUN pip install --no-cache-dir \
     # install link share
     jupyterlab-link-share==0.3.0 && \
     # install NVDashboard (https://developer.nvidia.com/blog/gpu-dashboards-in-jupyter-lab/)
-    # jupyterlab_nvdashboard==0.8.0 && \ does not work in current version
+    # nvdashboard does not work in current version
+    # jupyterlab_nvdashboard==0.8.0 && \ 
     # < END custom libraries
     # fix permissions of conda
     fix-permissions "${CONDA_DIR}" && \
