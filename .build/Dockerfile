@@ -327,7 +327,7 @@ USER ${NB_UID}
 # installation via conda leads to errors in version 4.8.2
 USER ${NB_UID}
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir tensorflow==2.12.0 keras==2.12 && \
+    pip install --no-cache-dir nvidia-cudnn-cu11==8.6.0.163 tensorflow==2.12.* keras==2.12 && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
@@ -346,6 +346,11 @@ RUN pip install --upgrade pip && \
 USER root
 ENV CUDA_PATH=/opt/conda/
 
+RUN mkdir -p $CUDA_PATH/etc/conda/activate.d && \
+    echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CUDA_PATH/etc/conda/activate.d/env_vars.sh && \
+    echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CUDA_PATH/lib/:$CUDNN_PATH/lib' >> $CUDA_PATH/etc/conda/activate.d/env_vars.sh && \
+    source $CUDA_PATH/etc/conda/activate.d/env_vars.sh
+
 # Install nvtop to monitor the gpu tasks
 RUN apt-get update && \
     apt-get install -y --no-install-recommends cmake libncurses5-dev libncursesw5-dev git && \
@@ -356,8 +361,8 @@ USER $NB_UID
 # Check error in Ubuntu-22.04 here: https://www.tensorflow.org/install/pip#step-by-step_instructions
 RUN conda install -c nvidia cuda-nvcc -y && \
     conda clean --all -f -y && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/$NB_USER"
 
 USER root
 RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
