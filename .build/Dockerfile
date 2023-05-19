@@ -332,16 +332,16 @@ RUN pip install --upgrade pip && \
     fix-permissions "/home/${NB_USER}"
 
 # Install dependencies for computer vision tasks
-RUN set -ex \
- && buildDeps=' \
-    opencv-python==4.6.0.66 \
-    facenet==1.0.5 \
-    deepface==0.0.79 \
-    onnx==1.12.0 \
-' \
- && pip install --no-cache-dir $buildDeps \
- && fix-permissions "${CONDA_DIR}" \
- && fix-permissions "/home/${NB_USER}"
+#RUN set -ex \
+# && buildDeps=' \
+#    opencv-python==4.6.0.66 \
+#    facenet==1.0.5 \
+#    deepface==0.0.79 \
+#    onnx==1.12.0 \
+#' \
+# && pip install --no-cache-dir $buildDeps \
+# && fix-permissions "${CONDA_DIR}" \
+# && fix-permissions "/home/${NB_USER}"
 
 USER root
 ENV CUDA_PATH=/opt/conda/
