@@ -335,14 +335,9 @@ RUN pip install --upgrade pip && \
 RUN set -ex \
  && buildDeps=' \
     opencv-python==4.6.0.66 \
+    facenet==1.0.5 \
     deepface==0.0.79 \
-    #onnx==1.9.0 \
-    gdown==3.10.1 \
-    Flask==1.1.2 \
-    mtcnn==0.1.0 \
-    retina-face==0.0.1 \
-    fire==0.4.0 \
-    gunicorn==20.1.0 \
+    onnx==1.12.0 \
 ' \
  && pip install --no-cache-dir $buildDeps \
  && fix-permissions "${CONDA_DIR}" \
@@ -365,7 +360,8 @@ RUN conda install -c nvidia cuda-nvcc -y && \
     fix-permissions /home/$NB_USER
 
 USER root
-RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas
+RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
+    ln -s /opt/conda/nvvm /usr/local/cuda
 
 USER $NB_UID
   ############################################################################
@@ -418,7 +414,8 @@ RUN pip install --no-cache-dir \
     # install link share
     jupyterlab-link-share==0.3.0 && \
     # install NVDashboard (https://developer.nvidia.com/blog/gpu-dashboards-in-jupyter-lab/)
-    # jupyterlab_nvdashboard==0.8.0 && \ does not work in current version
+    # does not work in current version
+    # jupyterlab_nvdashboard==0.8.0 && \
     # < END custom libraries
     # fix permissions of conda
     fix-permissions "${CONDA_DIR}" && \
