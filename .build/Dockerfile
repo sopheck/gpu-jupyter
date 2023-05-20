@@ -362,8 +362,7 @@ USER $NB_UID
 RUN conda install -c nvidia cuda-nvcc=11.3.58 && \
     conda clean --all -f -y && \
     fix-permissions "${CONDA_DIR}" && \
-    fix-permissions "/home/$NB_USER
-
+    fix-permissions "/home/$NB_USER"
 
 USER root
 # Configure the XLA cuda directory
