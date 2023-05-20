@@ -27,7 +27,7 @@ ENV CUDA_PATH=/opt/conda/
 
 RUN mkdir -p $CUDA_PATH/etc/conda/activate.d && \
     echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CUDA_PATH/etc/conda/activate.d/env_vars.sh && \
-    echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CUDA_PATH/lib/:$CUDNN_PATH/lib' >> $CUDA_PATH/etc/conda/activate.d/env_vars.sh && \
+    echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CUDA_PATH/lib/:$CUDNN_PATH/lib:/usr/local/cuda/lib64' >> $CUDA_PATH/etc/conda/activate.d/env_vars.sh && \
     source $CUDA_PATH/etc/conda/activate.d/env_vars.sh
 
 # Install nvtop to monitor the gpu tasks
@@ -38,20 +38,14 @@ RUN apt-get update && \
 # reinstall nvcc with cuda-nvcc to install ptax
 # fix errror in Ubuntu 22.04, see https://www.tensorflow.org/install/pip#step-by-step_instructions
 USER $NB_UID
-RUN conda install -c nvidia cuda-nvcc=11.3.58 && \
+RUN conda install -c nvidia cuda-nvcc=11.8.89 && \
     conda clean --all -f -y && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/$NB_USER"
 
 USER root
-# Configure the XLA cuda directory
-RUN mkdir -p $CONDA_PATH/etc/conda/activate.d && \
-    printf 'export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_PATH/lib/\n' >> $CONDA_PATH/etc/conda/activate.d/env_vars.sh && \
-    source $CONDA_PATH/etc/conda/activate.d/env_vars.sh && \
-    # Copy libdevice file to the required path
-    #mkdir -p $CONDA_PATH/lib/nvvm/libdevice && \
-    #cp $CONDA_PATH/lib/libdevice.10.bc $CONDA_PATH/lib/nvvm/libdevice/ 
-    # ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
-    ln -s /opt/conda/nvvm /usr/local/cuda/
+RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
+    ln -s /opt/conda/nvvm /usr/local/cuda && \
+    #ln -s /opt/conda/lib64/libnvrtc.so.11.8.89 /usr/local/cuda/lib64/libcudart.so.11.0
 
 USER $NB_UID
