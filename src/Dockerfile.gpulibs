@@ -45,7 +45,7 @@ RUN conda install -c nvidia cuda-nvcc=11.8.89 && \
 
 USER root
 RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
-    ln -s /opt/conda/nvvm /usr/local/cuda && \
+    ln -s /opt/conda/nvvm /usr/local/cuda
     #ln -s /opt/conda/lib64/libnvrtc.so.11.8.89 /usr/local/cuda/lib64/libcudart.so.11.0
 
 USER $NB_UID
