@@ -42,8 +42,8 @@ RUN apt-get update && \
 #    fix-permissions "${CONDA_DIR}" && \
 #    fix-permissions "/home/$NB_USER"
 
-#USER root
-#RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
-#    ln -s /opt/conda/nvvm /usr/local/cuda
+USER root
+RUN ln -s /opt/conda/nvvm /usr/local/cuda
+    # ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
 
 USER $NB_UID
