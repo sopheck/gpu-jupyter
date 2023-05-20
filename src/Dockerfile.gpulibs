@@ -36,14 +36,23 @@ RUN apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # reinstall nvcc with cuda-nvcc to install ptax
-#USER $NB_UID
-#RUN conda install -c nvidia cuda-nvcc -y && \
-#    conda clean --all -f -y && \
-#    fix-permissions "${CONDA_DIR}" && \
-#    fix-permissions "/home/$NB_USER"
+# fix errror in Ubuntu 22.04, see https://www.tensorflow.org/install/pip#step-by-step_instructions
+USER $NB_UID
+RUN conda install -c nvidia cuda-nvcc=11.3.58 && \
+    conda clean --all -f -y && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/$NB_USER
+
 
 USER root
-RUN ln -s /opt/conda/nvvm /usr/local/cuda
+# Configure the XLA cuda directory
+RUN mkdir -p $CONDA_PATH/etc/conda/activate.d && \
+    printf 'export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CONDA_PATH/lib/\n' >> $CONDA_PATH/etc/conda/activate.d/env_vars.sh && \
+    source $CONDA_PATH/etc/conda/activate.d/env_vars.sh && \
+    # Copy libdevice file to the required path
+    mkdir -p $CONDA_PATH/lib/nvvm/libdevice && \
+    cp $CONDA_PATH/lib/libdevice.10.bc $CONDA_PATH/lib/nvvm/libdevice/ 
     # ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
+    # ln -s /opt/conda/nvvm /usr/local/cuda/
 
 USER $NB_UID
