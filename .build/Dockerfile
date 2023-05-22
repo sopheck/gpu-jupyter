@@ -353,8 +353,8 @@ RUN apt-get update && \
 
 # reinstall nvcc with cuda-nvcc to install ptax
 USER $NB_UID
-RUN conda install -c "nvidia/label/cuda-11.8.0" cuda-nvcc cuda-nvrtc && \
-    conda install -c keras==2.12.0 && \
+RUN conda install -c "nvidia/label/cuda-11.8.0" cuda-nvcc cuda-nvrtc -y && \
+    conda install -c keras==2.12.0 -y && \
     conda clean --all -f -y && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/$NB_USER"
