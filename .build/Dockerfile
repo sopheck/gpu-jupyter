@@ -8,7 +8,7 @@
 # Use NVIDIA CUDA as base image and run the same installation as in the other packages.
 # The version of cuda must match those of the packages installed in src/Dockerfile.gpulibs
 FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
-LABEL authors="Christoph Schranz <christoph.schranz@salzburgresearch.at>, Mathematical Michael <consistentbayes@gmail.com>"
+LABEL authors="Christoph Schranz <christoph.schranz@salzburgresearch.at>, Mathematical Michael <consistentbayes@gmail.com>, sopheck <sophie.eckenstaler.1@hu-berlin.de>"
 # This is a concatenated Dockerfile, the maintainers of subsequent sections may vary.
 RUN chmod 1777 /tmp && chmod 1777 /var/tmp
 
@@ -327,19 +327,16 @@ USER ${NB_UID}
 # installation via conda leads to errors in version 4.8.2
 USER ${NB_UID}
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir tensorflow==2.12.0 && \
+    pip install --no-cache-dir tensorflow==2.12.0 keras==2.12 && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
 # Install dependencies for computer vision tasks
-#RUN set -ex \
-# && buildDeps=' \
+#RUN pip install --no-cache-dir
 #    opencv-python==4.6.0.66 \
 #    facenet==1.0.5 \
 #    deepface==0.0.79 \
 #    onnx==1.12.0 \
-#' \
-# && pip install --no-cache-dir $buildDeps \
 # && fix-permissions "${CONDA_DIR}" \
 # && fix-permissions "/home/${NB_USER}"
 
@@ -353,16 +350,16 @@ RUN apt-get update && \
 
 # reinstall nvcc with cuda-nvcc to install ptax
 USER $NB_UID
-RUN conda install -c keras=2.12.0 -y && \
-    conda install -c "nvidia/label/cuda-11.8.0" cuda-nvcc -y && \
+RUN conda install -c "nvidia/label/cuda-11.8.0" cuda-nvcc -y && \
     conda clean --all -f -y && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/$NB_USER"
 
 USER root
 RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
-    ln -s /opt/conda/nvvm /usr/local/cuda
-    #ln -s /opt/conda/lib64/libnvrtc.so.11.8.89 /usr/local/cuda/lib64/libcudart.so.11.0
+    ln -s /opt/conda/nvvm /usr/local/cuda && \
+    mv /usr/local/cuda/targets/x86_64-linux/lib/libnvrtc.so.11.8.89 /usr/local/cuda/targets/x86_64-linux/lib/libnvrtc.so && \
+    rm /usr/local/cuda/targets/x86_64-linux/lib/libnvrtc.so.11.2
 
 USER $NB_UID
   ############################################################################
