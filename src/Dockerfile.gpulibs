@@ -52,6 +52,6 @@ RUN conda install -c nvidia cuda-nvcc -y && \
 USER root
 RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
     # Check error in PyTorch2 https://discuss.pytorch.org/t/could-not-load-library-libcudnn-cnn-infer-so-8/175139/5
-    ln -s /opt/conda/lib/python3.10/site-packages/torch/lib/libnvrtc-672ee683.so.11.2 libnvrtc.so
+    ln -s /opt/conda/lib/python3.10/site-packages/torch/lib/libnvrtc-672ee683.so.11.2 /opt/conda/lib/python3.10/site-packages/torch/lib/libnvrtc.so
 
 USER $NB_UID
