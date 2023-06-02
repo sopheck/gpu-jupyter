@@ -41,6 +41,8 @@ RUN pip install --no-cache-dir \
     # install spell checker
     jupyterlab-spellchecker==0.7.3 \
     # > BEGIN custom libraries
+    opencv_jupyter_ui==1.4.2 \
+    ipycanvas==0.13.1 \
     # install link share
     jupyterlab-link-share==0.3.0 && \
     # install NVDashboard (https://developer.nvidia.com/blog/gpu-dashboards-in-jupyter-lab/)
