@@ -4,7 +4,7 @@ USER root
 
 # Install useful packages and Graphviz
 RUN apt-get update \
- && apt-get -y install --no-install-recommends htop apt-utils iputils-ping graphviz libgraphviz-dev openssh-client curl pv \
+ && apt-get -y install --no-install-recommends htop apt-utils iputils-ping graphviz libgraphviz-dev openssh-client curl pv ffmpeg \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID
@@ -20,7 +20,7 @@ RUN set -ex \
 # upgrade jupyter-server for compatibility
 RUN pip install --no-cache-dir --upgrade \
     distributed==2023.3.0 \
-    jupyter-server==2.4 \
+    jupyter-server==2.7.3 \
     # fix permissions of conda
  && fix-permissions "${CONDA_DIR}" \
  && fix-permissions "/home/${NB_USER}"
@@ -41,13 +41,6 @@ RUN pip install --no-cache-dir \
     # install spell checker
     jupyterlab-spellchecker==0.7.3 \
     # > BEGIN custom libraries
-    opencv_jupyter_ui==1.4.2 \
-    ipycanvas==0.13.1 \
-    # install link share
-    jupyterlab-link-share==0.3.0 && \
-    # install NVDashboard (https://developer.nvidia.com/blog/gpu-dashboards-in-jupyter-lab/)
-    # nvdashboard does not work in current version
-    # jupyterlab_nvdashboard==0.8.0 && \ 
     # < END custom libraries
     # fix permissions of conda
     fix-permissions "${CONDA_DIR}" && \
