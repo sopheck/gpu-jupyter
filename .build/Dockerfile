@@ -298,12 +298,12 @@ RUN mamba install --quiet --yes \
     fix-permissions "/home/${NB_USER}"
 
 # Install facets which does not have a pip or conda package at the moment
-WORKDIR /tmp
-RUN git clone https://github.com/PAIR-code/facets.git && \
-    jupyter nbextension install facets/facets-dist/ --sys-prefix && \
-    rm -rf /tmp/facets && \
-    fix-permissions "${CONDA_DIR}" && \
-    fix-permissions "/home/${NB_USER}"
+#WORKDIR /tmp
+#RUN git clone https://github.com/PAIR-code/facets.git && \
+#    jupyter nbextension install facets/facets-dist/ --sys-prefix && \
+#    rm -rf /tmp/facets && \
+#    fix-permissions "${CONDA_DIR}" && \
+#    fix-permissions "/home/${NB_USER}"
 
 # Import matplotlib the first time to build the font cache.
 ENV XDG_CACHE_HOME="/home/${NB_USER}/.cache/"
@@ -329,32 +329,6 @@ RUN conda install --quiet --yes \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
-# Check compatibility here:
-# https://pytorch.org/get-started/locally/
-# Installation via conda leads to errors installing cudatoolkit=11.1
-# RUN pip install --no-cache-dir torch==1.13.1 torchvision==0.14.1 torchaudio==0.13.1  && \
-#     torchviz==0.0.2 --extra-index-url https://download.pytorch.org/whl/cu116
-RUN set -ex \
- && buildDeps=' \
-    torch==2.0.0+cu118 \
-    torchvision==0.15.1+cu118 \ 
-' \
- && pip install --upgrade pip \
- && pip install --no-cache-dir $buildDeps --index-url https://download.pytorch.org/whl/cu118 \
- && pip install torchviz==0.0.2 torchsummary==1.5.1 torchinfo==1.7.2 \
- && fix-permissions "${CONDA_DIR}" \
- && fix-permissions "/home/${NB_USER}"
-
-# Install dependencies for computer vision tasks
-RUN pip install --no-cache-dir \
-    opencv-python>=4.6.0 \
-    ultralytics==8.0.99 \
-    'git+https://github.com/facebookresearch/detectron2.git' \
-    facenet-pytorch==2.5.3 \
-    onnx>=1.12.0 && \
-    fix-permissions "${CONDA_DIR}" && \
-    fix-permissions "/home/${NB_USER}" 
-
 USER root
 ENV CUDA_PATH=/opt/conda/
 
@@ -370,11 +344,6 @@ RUN conda install -c nvidia cuda-nvcc -y && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
-USER root
-RUN ln -s /opt/conda/bin/ptxas /usr/bin/ptxas && \
-    # Check error in PyTorch2 https://discuss.pytorch.org/t/could-not-load-library-libcudnn-cnn-infer-so-8/175139/5
-    ln -s /opt/conda/lib/python3.10/site-packages/torch/lib/libnvrtc-672ee683.so.11.2 /opt/conda/lib/python3.10/site-packages/torch/lib/libnvrtc.so
-
 USER $NB_UID
   ############################################################################
   ############################ Useful packages ###############################
@@ -386,7 +355,7 @@ USER root
 
 # Install useful packages and Graphviz
 RUN apt-get update \
- && apt-get -y install --no-install-recommends htop apt-utils iputils-ping graphviz libgraphviz-dev openssh-client curl pv \
+ && apt-get -y install --no-install-recommends htop apt-utils iputils-ping graphviz libgraphviz-dev openssh-client curl pv ffmpeg \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID
@@ -421,15 +390,8 @@ RUN pip install --no-cache-dir \
     ipyleaflet==0.17.2 \
     ipywidgets==8.0.4 \
     # install spell checker
-    jupyterlab-spellchecker==0.7.3 \
+    jupyterlab-spellchecker==0.7.3 && \
     # > BEGIN custom libraries
-    opencv_jupyter_ui==1.4.2 \
-    ipycanvas==0.13.1 \
-    # install link share
-    jupyterlab-link-share==0.3.0 && \
-    # install NVDashboard (https://developer.nvidia.com/blog/gpu-dashboards-in-jupyter-lab/)
-    # nvdashboard does not work in current version
-    # jupyterlab_nvdashboard==0.8.0 && \ 
     # < END custom libraries
     # fix permissions of conda
     fix-permissions "${CONDA_DIR}" && \
