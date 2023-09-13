@@ -20,7 +20,7 @@ RUN set -ex \
 # upgrade jupyter-server for compatibility
 RUN pip install --no-cache-dir --upgrade \
     distributed==2023.3.0 \
-    jupyter-server==2.4 \
+    jupyter-server==1.13.2 \
     # fix permissions of conda
  && fix-permissions "${CONDA_DIR}" \
  && fix-permissions "/home/${NB_USER}"

@@ -24,8 +24,8 @@ RUN apt-get update && \
 # Distributed under the terms of the Modified BSD License.
 
 # Ubuntu 20.04 (focal)
-# https://hub.docker.com/_/ubuntu/?tab=tags&name=focal
-ARG ROOT_CONTAINER=ubuntu:focal
+# https://hub.docker.com/_/ubuntu/tags?page=1&name=focal
+ARG ROOT_CONTAINER=ubuntu:20.04
 
 
 LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
@@ -53,7 +53,7 @@ RUN apt-get update --yes && \
     fonts-liberation \
     locales \
     # - pandoc is used to convert notebooks to html files
-    #   it's not present in arm64 ubuntu image, so we install it here
+    #   it's not present in aarch64 ubuntu image, so we install it here
     pandoc \
     # - run-one - a wrapper script that runs no more
     #   than one unique  instance  of  some  command with a unique set of arguments,
@@ -106,7 +106,7 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
 USER ${NB_UID}
 
 # Pin python version here, or set it to "default"
-ARG PYTHON_VERSION=3.10
+ARG PYTHON_VERSION=3.8
 
 # Setup work directory for backward-compatibility
 RUN mkdir "/home/${NB_USER}/work" && \
@@ -214,8 +214,6 @@ RUN apt-get update --yes && \
     tzdata \
     unzip \
     vim-tiny \
-    # Inkscape is installed to be able to convert SVG files
-    inkscape \
     # git-over-ssh
     openssh-client \
     # less is needed to run help in R
@@ -225,7 +223,9 @@ RUN apt-get update --yes && \
     # https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex
     texlive-xetex \
     texlive-fonts-recommended \
-    texlive-plain-generic && \
+    texlive-plain-generic \
+    # Enable clipboard on Linux host systems
+    xclip && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create alternative for nano -> nano-tiny
@@ -233,6 +233,9 @@ RUN update-alternatives --install /usr/bin/nano nano /bin/nano-tiny 10
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
+
+# Add R mimetype option to specify how the plot returns from R to the browser
+#COPY --chown=${NB_UID}:${NB_GID} Rprofile.site /opt/conda/lib/R/etc/
 
 ############################################################################
 ################# Dependency: jupyter/scipy-notebook #######################
@@ -371,7 +374,7 @@ RUN set -ex \
 # upgrade jupyter-server for compatibility
 RUN pip install --no-cache-dir --upgrade \
     distributed==2023.3.0 \
-    jupyter-server==2.4 \
+    jupyter-server==1.13.2 \
     # fix permissions of conda
  && fix-permissions "${CONDA_DIR}" \
  && fix-permissions "/home/${NB_USER}"
