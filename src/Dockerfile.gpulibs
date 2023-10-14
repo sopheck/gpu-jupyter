@@ -23,4 +23,13 @@ RUN conda install -c nvidia cuda-nvcc -y && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
+# install python-apt package into our conda env
+USER root
+RUN export PYTHONPATH="$PYTHONPATH:/opt/conda/lib/python3.10" && \
+    apt-get update && \
+    apt-get install -y python3.10-apt && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 USER $NB_UID
+RUN fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
